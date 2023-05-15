@@ -1,0 +1,22 @@
+{"intents": [
+    {"tag": "greeting",
+    "patterns": ["hi","hello"],
+    "responses": ["Hi there!"]
+    },
+    {"tag": "name",
+    "patterns": ["What is your name?", "What's your name?", "name", "Your name?", "whats ur name?", "whats your name?", "Who are you?"],
+    "responses": ["I don't have a name yet...", "I'm just a ChatBot :("]
+    },
+    {"tag": "package_send",
+    "patterns": ["How to send out a package?", "What to do if i want to send a package?", "package sending", "package sending step-by-step"],
+    "responses": ["To send out a package, there is the steps:\n1. Sign this form:\n2. Go to this place...\n3. ect..."]
+    },
+    {"tag": "package_recieve",
+    "patterns": ["How to get my package?", "Where to get my package?", "Where is my package?"],
+    "responses": ["If it's arrived, you can pick up it at the import section."]
+    },
+    {"tag": "leave",
+    "patterns": ["quit", "exit", "okay, bye", "thanks, bye", "see you soon!"],
+    "responses": ["Bye!", "See you soon!", "I will be here if you need my further assistance :D"]
+    }
+]}
