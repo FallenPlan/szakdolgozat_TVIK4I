@@ -447,6 +447,7 @@ class NeuralNetwork:
             batch_x = batch_x[:batch_size, :]
             batch_y = batch_y[:batch_size, :]
             
+            
             # print("xshape:\n", X_arr.shape[0])
             #azért kell shape és nem len, mert a len, csak az első dimenzió méretét adja meg, nem az összesét
         # for i in range('0, X_arr.shape[0], training):

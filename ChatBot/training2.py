@@ -69,9 +69,13 @@ sorted_list = sorted(list_of_string)
 
 sorted_list = set(list_of_string)
 
+# print("1:\n", sorted_list)
+
 word_lem = [token.lemma_ for token in words]
 # print("\nwlemma", word_lem)
 # print("\n")
+
+# print("2:\n", word_lem)
 
 word_lem_nlp = []
 
@@ -90,6 +94,7 @@ punctsorted = [x.lower() for x in punctsorted]
 allsorted = sorted(set(allsorted))
 # print("allsorted:", allsorted)
 punctsorted = sorted(set(punctsorted))
+# print("punctsorted:", punctsorted)
       
 #One-Hot encoding
 #Bag of words
@@ -112,10 +117,16 @@ punctsorted = sorted(set(punctsorted))
 # =============================================================================
 # words_list = [str(token) for token in words]
 # labels_list = [str(token) for token in labels]
-# 
-# json.dump(words_list, open('words.json', 'w'))
-# json.dump(labels_list, open('labels.json', 'w'))
 # =============================================================================
+
+# print("puncsorted:", punctsorted)
+# print("labels:", labels)
+
+words_list = punctsorted
+labels_list = labels
+
+json.dump(words_list, open('words.json', 'w'))
+json.dump(labels_list, open('labels.json', 'w'))
 
 training = []
 #tags length
@@ -246,8 +257,10 @@ class NeuralNetwork:
         # output_activation = self.activations[1]
         hidden_activation = self.activations[0]
         
-        print("pred\n", pred)
-        print("y\n", y)
+# =============================================================================
+#         print("pred\n", pred)
+#         print("y\n", y)
+# =============================================================================
         
         #Backpropagation
         delta_output = 2 * (pred - y)
@@ -352,35 +365,41 @@ class NeuralNetwork:
             # else:
             
     # def train(self, training, learning_rate, epochs, batch_size):
-    def train(self, X, y, learning_rate, epochs, batch_size):
-        # for epoch in epochs:
+    def train(self, X, y, learning_rate, epochs, batch_size, test_size, train_ratio):
             
         self.learning_rate = learning_rate
-        print("LR", learning_rate)
-        loss = 0.0
+        # print("LR", learning_rate)
         
-        batch_x = X
-        batch_y = y
-
+        total_rows = X.shape[0]
+        train_size = int(total_rows * train_ratio)
+        # testing_size = int(total_rows-train_size)
+        
+        # batch_x = X
+        # batch_y = y
+        
+        #random batch group
+        batch_x = X[:train_size, :]
+        batch_y = y[:train_size, :]
+        
+        test_x = X[train_size:, :]
+        test_y = y[train_size:, :]
+        
+        
+        print("batch_x\n", len(batch_x))
+        print("batch_y\n", len(batch_y))
+        
+        print("test_x\n", len(test_x))
+        print("test_y\n", len(test_y))
+        
+        print("batch_x\n", batch_x)
+        print("test_x\n", test_x)
+        
+        print("train.shape", batch_x.shape)
+        print("test.shape", test_x.shape)
         
         for epoch in range(epochs):
             loss = 0.0
             
-            # shuffled_data = shuffle_data(training)
-            
-            # batch_x = shuffled_data[0]
-            # batch_y = shuffled_data[1]
-            
-            # print("batch_x", batch_x)
-            # print("batch_y", batch_y)
-            
-            
-            # batch_x = np.array(batch_x)
-            # batch_y = np.array(batch_y)
-                        
-            #random batch group
-            batch_x = batch_x[:batch_size, :]
-            batch_y = batch_y[:batch_size, :]
             
             # print("xshape:\n", X_arr.shape[0])
             #azért kell shape és nem len, mert a len, csak az első dimenzió méretét adja meg, nem az összesét
@@ -445,6 +464,50 @@ class NeuralNetwork:
 
         # return model_Ws_Bs
         
+    def test(self, X, y, batch_size, test_size, train_ratio):
+            
+        self.learning_rate = learning_rate
+        # print("LR", learning_rate)
+        
+        total_rows = X.shape[0]
+        train_size = int(total_rows * train_ratio)
+        # testing_size = int(total_rows-train_size)
+        
+        # batch_x = X
+        # batch_y = y
+        
+        #random test group
+        test_x = X[train_size:, :]
+        test_y = y[train_size:, :]
+    
+
+        print("INFORWARD")
+        # print("batch_x", batch_x)
+        
+        #forward propagation
+        f_pred = self.forward(test_x)
+        
+        print("f_pred: ", f_pred)
+        print("test_y: ", test_y)
+        
+        f_pred = np.array(f_pred)
+        
+        correct_sum = np.sum(f_pred.diagonal())
+        
+        print("correct_sum: ", correct_sum)
+        
+        total_preds = f_pred.sum()
+        
+        print("potal_preds: ", total_preds)
+        
+        accuracy = correct_sum / total_preds
+        
+        # accuracy = np.mean(f_pred/test_y)
+
+        print("Accuracy: ", accuracy)
+        # loss = np.mean(1/len(batch_y) * sum(np.square(batch_y - f_output)))
+        
+        
 test_list_x = np.array([[1, 0, 1], [0, 1, 1], [0, 1, 0]])
 # [[1, 0, 1], [0, 1, 1]]
 test_list_y = np.array([[1, 0], [1, 0], [0, 1]])
@@ -467,20 +530,26 @@ training = np.array(training, dtype=object)
 train_x = list(training[:, 0])
 train_y = list(training[:, 1])
 
-print("tX\n", train_x)
-print("tY\n", train_y)
+print("train_x\n", len(train_x))
+print("train_y\n", len(train_y))
+
+# print("tX\n", train_x)
+# print("tY\n", train_y)
 
 # print("tx", shuffle_data(training).train_x)
 # print("ty", shuffle_data(training).train_y)
 
-learning_rate = 0.01 #0.1
+learning_rate = 0.001 #0.1
 epochs = 40
-batch_size = 5
+train_ratio = 0.7
+batch_size = 15
+test_size = round(batch_size/2)
+print("TEST_SIZE", test_size)
 nn = NeuralNetwork(32, 50, 5)
 
-model = nn.train(np.array(train_x), np.array(train_y), learning_rate, epochs, batch_size)
+model = nn.train(np.array(train_x), np.array(train_y), learning_rate, epochs, batch_size, test_size, train_ratio)
     
-
+test = nn.test(np.array(train_x), np.array(train_y), batch_size, test_size, train_ratio)
 
 # model = nn.train(training, learning_rate, epochs, batch_size) #len(test_list_x)
 # =============================================================================

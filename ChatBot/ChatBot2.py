@@ -51,27 +51,40 @@ def bag_of_words(text):
             if word == w:
                 bow[i] = 1
                 
+    # print("bow:", bow)
     return np.array(bow)
 
 print("words:\n", words)
 
-def predict(model, text):
+def predict(text):
+    
+    activations = [
+        activation.ReLU(),
+        activation.Softmax()
+        ]
+    
     print("text:\n", text)
     hidden_layer = np.dot(text, hw) + hb
-    hidden_activation = activation.ReLU().forward(hidden_layer)
+    activations[0].forward(hidden_layer)
+    hidden_activation = activations[0].output
     output_layer = np.dot(hidden_activation, ow) + ob
-    output_activation = activation.Softmax().forward(output_layer)
+    activations[1].forward(output_layer)
+    output_activation = activations[1].output
     
-    print("output_activation\n", output_activation)
-    predicted_labels = np.argmax(output_activation, axis=1)
-    print("predicted_labels\n", predicted_labels)
-    return predicted_labels
+    # print("output_activation\n", output_activation)
+    # predicted_labels = np.argmax(output_activation, axis=1)
+    # print("predicted_labels\n", predicted_labels)
+    # return predicted_labels
+    return output_activation
 
 def pred_label(text):
     bow = bag_of_words(text)
-    result = predict(model, np.array([bow]))[0]
-    treshold = 0.3
-    results = [[i, r] for i, r in enumerate(result) if r > treshold]
+    # print("model:", model)
+    # print("np.array([bow])", np.array([bow]))
+    result = predict(np.array([bow]))[0]
+    print("result:", result)
+    threshold = 0.3
+    results = [[i, r] for i, r in enumerate(result) if r > threshold]
     
     results.sort(key=lambda x: x[1], reverse=True)
     result_list = []
@@ -90,6 +103,7 @@ def pred_label(text):
 # =============================================================================
 
 def get_response(intents_list, intents_json):
+    print("LEN:", intents_list)
     if len(intents_list) == 0:
         result = "Sorry! I don't understand."
     else:
