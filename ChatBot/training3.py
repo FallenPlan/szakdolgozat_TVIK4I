@@ -24,7 +24,7 @@ import activations as activation
 #nlp = spacy.load("hu_core_news_lg")
 nlp = spacy.load("en_core_web_sm")
 
-with open(r"C:\\szakdolgozat_TVIK4I\\ChatBot\\intents.json") as file:
+with open(r"C:\\Users\\CSB5MC\\Desktop\\python\\szakdoga\\intents.json") as file:
     intents = json.load(file)
 
 sentence = "Hello világ! Nagyon örülök, hogy találkozhattam veletek ezen a rohanó és szép napon."
@@ -222,8 +222,8 @@ class NeuralNetwork:
         
 
         # plt.plot(train_Y[0])
-        plt.plot(train_y[:5])
-        plt.plot(self.prediction[:5])
+        plt.plot(train_Y[2])
+        plt.plot(self.prediction[2])
         plt.show()
 # =============================================================================
 #         print("laset_pred:\n", self.prediction[-1])
@@ -256,13 +256,16 @@ class NeuralNetwork:
         dhidden = np.dot(delta_output, output_layer.weights.T) * hidden_activation.doutput
         
         #Gradient Descent
-        output_layer.grad_weights = np.dot(hidden_activation.output.T, delta_output)
-        output_layer.grad_biases = np.sum(delta_output, axis=0)
-        hidden_layer.grad_weights = np.dot(X.T, dhidden)
-        hidden_layer.grad_biases = np.sum(dhidden, axis=0)
+        output_layer.grad_weights = np.dot(hidden_activation.output.T, delta_output) #/ batch
+        output_layer.grad_biases = np.sum(delta_output, axis=0) #/ batch
+        hidden_layer.grad_weights = np.dot(X.T, dhidden) #/ batch
+        hidden_layer.grad_biases = np.sum(dhidden, axis=0) #/ batch
         
+        # print("output_layer.weights\n", output_layer.weights)
+        # print("output_layer.grad_weights\n", output_layer.grad_weights)
         #Update Weights and Biases
         output_layer.weights -= learning_rate * output_layer.grad_weights
+        # print("output_layer.weights\n", output_layer.weights)
         output_layer.biases -= learning_rate * output_layer.grad_biases
         hidden_layer.weights -= learning_rate * hidden_layer.grad_weights
         hidden_layer.biases -= learning_rate * hidden_layer.grad_biases
@@ -361,7 +364,69 @@ class NeuralNetwork:
         
         batch_x = X
         batch_y = y
-
+# =============================================================================
+#         
+#             print("INFORWARD")
+#             # print("batch_x", batch_x)
+#             
+#             #forward propagation
+#             f_output = self.forward(batch_x)
+#             
+#             print("INBACKWARD")
+#         
+#             #backward propagation
+#             ow, ob, hw, hb = self.backward(batch_x, batch_y, learning_rate)
+#         
+#     # =============================================================================
+#     #             print("epochs", epochs)
+#     #             print("epoch:", epoch)
+#     #             
+#     #             if epoch == epochs-1:
+#     #                 model_Ws_Bs = {
+#     #                     'hidden_W': hw.tolist(),
+#     #                     'hidden_B': hb.tolist(),
+#     #                     'output_W': ow.tolist(),
+#     #                     'output_B': ob.tolist()
+#     #                 }
+#     #                 
+#     #                 # json_path = "/path/save/model.json"
+#     #                 with open('model.json', 'w') as file:
+#     #                     json.dump(model_Ws_Bs, file)
+#     #                     
+#     #                 print("model saved!")
+#     # =============================================================================
+#         
+#         
+#     
+#     #calculate the loss/cost/error Mean Squared Error (MSE)
+#     # =============================================================================
+#     #             print("VALUE:\n",  batch_y)
+#     #             print("VALUE:\n",  f_output)
+#     # =============================================================================
+#         # print("VALUE:\n", batch_y - f_output)
+#         
+#             loss = np.mean(1/len(batch_y) * sum(np.square(batch_y - f_output)))
+#             # loss = np.mean((f_output - batch_y)**2)
+#             # loss = np.mean(1/len(train_y) * sum((batch_y - f_output)**2))
+#             # cost = -np.mean(train_Y * np.log(f_output) + (1 - train_Y) * np.log(1 - f_output))
+#         
+#         
+#         # =============================================================================
+#         #             print("last_y:", y[i])
+#         # =============================================================================
+#             # print("out:", f_output)
+#         
+#         # =============================================================================
+#         #             loss = np.mean(1/len(train_Y) * sum((y[i] - f_output)**2))
+#         # =============================================================================
+#             
+#         
+#         #print the loss for the epoch
+#             print(f"Epoch {epoch+1} / {epochs}, loss = {loss / batch_x.shape[0]}")
+# =============================================================================
+    
+        # X_arr = np.array(X)
+        # y_arr = np.array(y)
         
         for epoch in range(epochs):
             loss = 0.0
@@ -398,22 +463,24 @@ class NeuralNetwork:
             #backward propagation
             ow, ob, hw, hb = self.backward(batch_x, batch_y, learning_rate)
             
-            print("epochs", epochs)
-            print("epoch:", epoch)
-            
-            if epoch+1 == epochs:
-                model_Ws_Bs = {
-                    'hidden_W': hw.tolist(),
-                    'hidden_B': hb.tolist(),
-                    'output_W': ow.tolist(),
-                    'output_B': ob.tolist()
-                }
-                
-                # json_path = "/path/save/model.json"
-                with open('model.json', 'w') as file:
-                    json.dump(model_Ws_Bs, file)
-                    
-                print("model saved!")
+# =============================================================================
+#             print("epochs", epochs)
+#             print("epoch:", epoch)
+#             
+#             if epoch == epochs-1:
+#                 model_Ws_Bs = {
+#                     'hidden_W': hw.tolist(),
+#                     'hidden_B': hb.tolist(),
+#                     'output_W': ow.tolist(),
+#                     'output_B': ob.tolist()
+#                 }
+#                 
+#                 # json_path = "/path/save/model.json"
+#                 with open('model.json', 'w') as file:
+#                     json.dump(model_Ws_Bs, file)
+#                     
+#                 print("model saved!")
+# =============================================================================
             
             
 
@@ -449,6 +516,28 @@ test_list_x = np.array([[1, 0, 1], [0, 1, 1], [0, 1, 0]])
 # [[1, 0, 1], [0, 1, 1]]
 test_list_y = np.array([[1, 0], [1, 0], [0, 1]])
 
+# =============================================================================
+# testx = [[1, 0], [0, 1], [1, 1], [0, 0]]
+# testy = [[1], [1], [0], [0]]
+# =============================================================================
+
+# =============================================================================
+# testx = [[1,0,0], [0,1,0], [0,0,1], [1,1,0], [1,0,1], [0,1,1], 
+#          [0,0,0], [1,1,1]]
+# testy = [[0,1], [0,1], [0,1], [1,0], [1,0], [1,0],
+#          [0,0], [1,1]]
+# =============================================================================
+
+# test_activation = activation.Softmax()
+
+# x = np.array([[1, 0, 0],
+#               [0, 1, 0],
+#               [1, 0, 0],
+#               [0, 0, 1]])
+
+# test_activation.forward(x)
+# print("x_pred:\n", test_activation.output)
+
 
 # =============================================================================
 # def shuffle_data(training):
@@ -474,9 +563,9 @@ print("tY\n", train_y)
 # print("ty", shuffle_data(training).train_y)
 
 learning_rate = 0.01 #0.1
-epochs = 40
+epochs = 100
 batch_size = 5
-nn = NeuralNetwork(32, 50, 5)
+nn = NeuralNetwork(32, 2, 5)
 
 model = nn.train(np.array(train_x), np.array(train_y), learning_rate, epochs, batch_size)
     

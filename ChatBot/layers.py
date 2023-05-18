@@ -6,10 +6,10 @@ class Dense:
         print("\ninput", n_input)
         print("neuron", n_neuron)
         self.weights = np.random.randn(n_input, n_neuron) #* 0.1
-        # print("weights:\n", self.weights)
+        print("weights:\n", self.weights)
         self.biases = np.zeros((1, n_neuron)) #, dtype=int
         
-        self.grad_weights = np.array([])
+        self.grad_weights = []
         self.grad_biases = []
         
         # self.weight_hod = np.array([])

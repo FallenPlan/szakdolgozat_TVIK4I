@@ -100,6 +100,22 @@ def dsoftmax(softmax):
     # creating 1 row matrixes/vectors to match the dimensions
     # def dActivation(self, inputs):
         
+import sympy as sp        
+
+# x = 3
+# y = 1
+
+# test = (x - y)**2
+# print("test", test)
+
+# test2 = 2 * (x - y)
+# print("test2", test2)
+
+# f = (x - y)**2
+# test3 = sp.diff(f, x)
+# print("test3", test3)
+
+
 
 # def dActivation(x):
 #     return x * (1 - x)

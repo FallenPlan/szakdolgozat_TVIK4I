@@ -14,7 +14,7 @@ import activations as activation
 
 nlp = spacy.load("en_core_web_sm")
 
-intents = json.loads(open(r"C:\\Users\\CSB5MC\\Desktop\\python\\szakdoga\\intents.json").read())
+intents = json.loads(open(r"C:\\szakdolgozat_TVIK4I\\ChatBot\\intents.json").read())
 
 #load saved datas
 words = json.load(open('words.json', 'r'))
@@ -28,6 +28,8 @@ hw = np.array(model['hidden_W'])
 hb = np.array(model['hidden_B'])
 ow = np.array(model['output_W'])
 ob = np.array(model['output_B'])
+
+print("hw\n", ob)
 
 
 def clean_text(text):
@@ -51,16 +53,23 @@ def bag_of_words(text):
                 
     return np.array(bow)
 
-def predict(text):
+print("words:\n", words)
+
+def predict(model, text):
+    print("text:\n", text)
     hidden_layer = np.dot(text, hw) + hb
     hidden_activation = activation.ReLU().forward(hidden_layer)
     output_layer = np.dot(hidden_activation, ow) + ob
     output_activation = activation.Softmax().forward(output_layer)
-    return output_activation
+    
+    print("output_activation\n", output_activation)
+    predicted_labels = np.argmax(output_activation, axis=1)
+    print("predicted_labels\n", predicted_labels)
+    return predicted_labels
 
 def pred_label(text):
     bow = bag_of_words(text)
-    result = predict(np.array([bow]))[0]
+    result = predict(model, np.array([bow]))[0]
     treshold = 0.3
     results = [[i, r] for i, r in enumerate(result) if r > treshold]
     
