@@ -83,7 +83,7 @@ def pred_label(text):
     # print("np.array([bow])", np.array([bow]))
     result = predict(np.array([bow]))[0]
     print("result:", result)
-    threshold = 0.3
+    threshold = 0.2
     results = [[i, r] for i, r in enumerate(result) if r > threshold]
     
     results.sort(key=lambda x: x[1], reverse=True)

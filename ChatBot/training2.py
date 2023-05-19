@@ -365,37 +365,40 @@ class NeuralNetwork:
             # else:
             
     # def train(self, training, learning_rate, epochs, batch_size):
-    def train(self, X, y, learning_rate, epochs, batch_size, test_size, train_ratio):
+    def train(self, X, y, learning_rate, epochs, batch_size, train_ratio):
             
         self.learning_rate = learning_rate
         # print("LR", learning_rate)
         
-        total_rows = X.shape[0]
-        train_size = int(total_rows * train_ratio)
+        # total_rows = X.shape[0]
+        # train_size = int(total_rows * train_ratio)
         # testing_size = int(total_rows-train_size)
         
         # batch_x = X
         # batch_y = y
         
         #random batch group
-        batch_x = X[:train_size, :]
-        batch_y = y[:train_size, :]
+        # batch_x = X[:train_size, :]
+        # batch_y = y[:train_size, :]
         
-        test_x = X[train_size:, :]
-        test_y = y[train_size:, :]
+        batch_x = X[:batch_size, :]
+        batch_y = y[:batch_size, :]
+        
+        # test_x = X[train_size:, :]
+        # test_y = y[train_size:, :]
         
         
-        print("batch_x\n", len(batch_x))
-        print("batch_y\n", len(batch_y))
+        # print("batch_x\n", len(batch_x))
+        # print("batch_y\n", len(batch_y))
         
-        print("test_x\n", len(test_x))
-        print("test_y\n", len(test_y))
+        # print("test_x\n", len(test_x))
+        # print("test_y\n", len(test_y))
         
-        print("batch_x\n", batch_x)
-        print("test_x\n", test_x)
+        # print("batch_x\n", batch_x)
+        # print("test_x\n", test_x)
         
-        print("train.shape", batch_x.shape)
-        print("test.shape", test_x.shape)
+        # print("train.shape", batch_x.shape)
+        # print("test.shape", test_x.shape)
         
         for epoch in range(epochs):
             loss = 0.0
@@ -406,19 +409,19 @@ class NeuralNetwork:
         # for i in range('0, X_arr.shape[0], training):
 
             
-            print("INFORWARD")
+            # print("INFORWARD")
             # print("batch_x", batch_x)
             
             #forward propagation
             f_output = self.forward(batch_x)
             
-            print("INBACKWARD")
+            # print("INBACKWARD")
 
             #backward propagation
             ow, ob, hw, hb = self.backward(batch_x, batch_y, learning_rate)
             
-            print("epochs", epochs)
-            print("epoch:", epoch)
+            # print("epochs", epochs)
+            # print("epoch:", epoch)
             
             if epoch+1 == epochs:
                 model_Ws_Bs = {
@@ -464,7 +467,7 @@ class NeuralNetwork:
 
         # return model_Ws_Bs
         
-    def test(self, X, y, batch_size, test_size, train_ratio):
+    def test(self, X, y, test_size, train_ratio):
             
         self.learning_rate = learning_rate
         # print("LR", learning_rate)
@@ -481,24 +484,38 @@ class NeuralNetwork:
         test_y = y[train_size:, :]
     
 
-        print("INFORWARD")
+        # print("INFORWARD")
         # print("batch_x", batch_x)
         
         #forward propagation
         f_pred = self.forward(test_x)
         
-        print("f_pred: ", f_pred)
-        print("test_y: ", test_y)
+        print("f_pred:\n", f_pred)
+        print("test_y:\n", test_y)
         
-        f_pred = np.array(f_pred)
+        # f_pred = np.array(f_pred)
         
-        correct_sum = np.sum(f_pred.diagonal())
+        pred_matrix = np.zeros_like(test_y)
+        
+        for i in range(f_pred.shape[0]):
+            pred_answer = np.argmax(f_pred[i])
+            
+            print("pred_answer ; y:", pred_answer+1, test_y[i])
+            
+            pred_matrix[i][pred_answer] = 1
+            
+        
+        correct_sum = 0
+        
+        for i in range(f_pred.shape[0]):
+            if np.array_equal(pred_matrix[i], test_y[i]):
+                correct_sum += 1
         
         print("correct_sum: ", correct_sum)
         
-        total_preds = f_pred.sum()
+        total_preds = round(f_pred.sum())
         
-        print("potal_preds: ", total_preds)
+        print("total_preds: ", total_preds)
         
         accuracy = correct_sum / total_preds
         
@@ -506,11 +523,6 @@ class NeuralNetwork:
 
         print("Accuracy: ", accuracy)
         # loss = np.mean(1/len(batch_y) * sum(np.square(batch_y - f_output)))
-        
-        
-test_list_x = np.array([[1, 0, 1], [0, 1, 1], [0, 1, 0]])
-# [[1, 0, 1], [0, 1, 1]]
-test_list_y = np.array([[1, 0], [1, 0], [0, 1]])
 
 
 # =============================================================================
@@ -539,17 +551,17 @@ print("train_y\n", len(train_y))
 # print("tx", shuffle_data(training).train_x)
 # print("ty", shuffle_data(training).train_y)
 
-learning_rate = 0.001 #0.1
-epochs = 40
-train_ratio = 0.7
-batch_size = 15
+learning_rate = 0.01 #0.1
+epochs = 100
+train_ratio = 0.6
+batch_size = 20
 test_size = round(batch_size/2)
 print("TEST_SIZE", test_size)
-nn = NeuralNetwork(32, 50, 5)
+nn = NeuralNetwork(35, 50, 6)
 
-model = nn.train(np.array(train_x), np.array(train_y), learning_rate, epochs, batch_size, test_size, train_ratio)
+model = nn.train(np.array(train_x), np.array(train_y), learning_rate, epochs, batch_size, train_ratio)
     
-test = nn.test(np.array(train_x), np.array(train_y), batch_size, test_size, train_ratio)
+test = nn.test(np.array(train_x), np.array(train_y), test_size, train_ratio)
 
 # model = nn.train(training, learning_rate, epochs, batch_size) #len(test_list_x)
 # =============================================================================
