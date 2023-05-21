@@ -62,12 +62,19 @@ body {
 
   .user-text p,
   .bot-text p {
-    background-color: #a3f1ff;
     border-radius: 20px;
     padding: 12px 20px;
     margin: 0;
     font-size: 16px;
     line-height: 1.5;
+  }
+
+  .user-text p {
+    background-color: purple;
+  }
+
+  .bot-text p {
+    background-color: #a3f1ff;
   }
 
   .input-container {

@@ -35,7 +35,7 @@ print("hw\n", ob)
 def clean_text(text):
     tokens = nlp(text)
     tokens = [token.lemma_ for token in tokens]
-    print("3")
+    print("1")
     return tokens
 
 def bag_of_words(text):
@@ -77,7 +77,7 @@ def predict(text):
     # predicted_labels = np.argmax(output_activation, axis=1)
     # print("predicted_labels\n", predicted_labels)
     # return predicted_labels
-    print("1")
+    print("3")
     return output_activation
 
 def pred_label(text):
@@ -109,8 +109,11 @@ def pred_label(text):
 def get_response(intents_list, intents_json):
     print("5")
     print("LEN:", intents_list)
-    if len(intents_list) == 0:
-        result = "Sorry! I don't understand."
+    probability = float(intents_list[0]['probability'])
+    print("prob:", probability)
+    if probability < 0.5:
+        result = "I don't understand."
+        return result
     else:
         tag = intents_list[0]['intent']
         list_of_intents = intents_json['intents']
@@ -121,7 +124,7 @@ def get_response(intents_list, intents_json):
         return result
     
 def chatBot(message):
-    print("1")
+    print("ChatBot")
     print("Ask me something! :)")
     #while True:
     #message = input("You: ")
