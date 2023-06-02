@@ -21,7 +21,7 @@
         <div class="wrapper">
           <input type="text" id="user-input" placeholder="Type your question here...">
           <button id="send-button" onclick="message()">
-            <img src="static\pictures\sendicon.png" alt="send" border="0" height="25px" width="25px">
+            <img src="static\pictures\sendicon.png" alt="send" border="0" height="20px" width="25px">
           </button>
         </div>
       </div>
@@ -67,7 +67,7 @@
     // Add an event listener to the input field
     document.getElementById('user-input').addEventListener('keyup', function(event) {
     if (event.key === "Enter") { // Check if Enter key is pressed
-      event.preventDefault(); // Prevent default form submission
+      event.preventDefault();
       document.getElementById('send-button').click(); // Trigger the click event of the send button
     }
     });

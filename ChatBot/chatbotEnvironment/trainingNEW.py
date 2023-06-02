@@ -8,7 +8,7 @@ Created on Tue Apr 11 15:44:08 2023
 import sys
 # print(sys.path)
 # if sys.path
-sys.path.append('C:\szakdolgozat_TVIK4I\ChatBot')
+sys.path.append('C:\szakdolgozat_TVIK4I\ChatBot\chatbotEnvironment')
 
 import random
 import spacy
@@ -24,7 +24,7 @@ import activations as activation
 #nlp = spacy.load("hu_core_news_lg")
 nlp = spacy.load("en_core_web_sm")
 
-with open(r"C:\\szakdolgozat_TVIK4I\\ChatBot\\intents.json") as file:
+with open(r"C:\szakdolgozat_TVIK4I\ChatBot\chatbotEnvironment\intentsNEW.json") as file:
     intents = json.load(file)
 
 sentence = "Hello világ! Nagyon örülök, hogy találkozhattam veletek ezen a rohanó és szép napon."
@@ -196,48 +196,36 @@ class NeuralNetwork:
         # self.learning_rate = learning_rate
         self.layers = [
             layer.Dense(input_neuron, hidden_neuron),
-            # layer.Dense(hidden_neuron, hidden_neuron),
+            layer.Dense(hidden_neuron, hidden_neuron),
             layer.Dense(hidden_neuron, output_neuron)
             ]
         self.activations = [
             activation.ReLU(),
-            # activation.ReLU(),
+            activation.ReLU(),
             activation.Softmax()
             # activation.Test()
             ]
         
         
     def forward(self, X):
-        # print("\nX_type:\n", type(X))
-        # print("\nX:\n", X)
-        self.layers[0].forward(X)
-        # print("\nhidden1:\n", self.layers[0].output)
-        self.activations[0].forward(self.layers[0].output)
-        # print("\nrelu:\n", self.activations[0].output)
-        self.hidden = self.activations[0].output
-        self.layers[1].forward(self.activations[0].output)
-        # print("\nhidden2:\n", self.layers[1].output)
-        self.activations[1].forward(self.layers[1].output)
-        # print("\nsoftmax:\n", self.activations[1].output)
-        self.prediction = self.activations[1].output
+
         
-        # self.layers[0].forward(X)
-        # self.activations[0].forward(self.layers[0].output)
-        # self.layers[1].forward(self.activations[0].output)
-        # self.activations[1].forward(self.layers[1].output)
-        # self.layers[2].forward(self.activations[1].output)
-        # self.activations[2].forward(self.layers[2].output)
-        # self.prediction = self.activations[2].output
+        self.layers[0].forward(X)
+        self.activations[0].forward(self.layers[0].output)
+        self.layers[1].forward(self.activations[0].output)
+        self.activations[1].forward(self.layers[1].output)
+        self.layers[2].forward(self.activations[1].output)
+        self.activations[2].forward(self.layers[2].output)
+        self.prediction = self.activations[2].output
 
         # plt.plot(test_list_x[0])
         
 
         # plt.plot(train_Y[0])
-        plt.plot(train_y[:5])
-        plt.plot(self.prediction[:5])
-        plt.show()
 # =============================================================================
-#         print("laset_pred:\n", self.prediction[-1])
+#         plt.plot(train_y[:5])
+#         plt.plot(self.prediction[:5])
+#         plt.show()
 # =============================================================================
         
         return self.prediction
@@ -251,118 +239,50 @@ class NeuralNetwork:
         # batch = X.shape[0]
         
         
-        output_layer = self.layers[1]
+        output_layer = self.layers[2]
+        hidden_layer2 = self.layers[1]
         hidden_layer = self.layers[0]
         
-        # output_activation = self.activations[1]
+        hidden_activation2 = self.activations[1]
         hidden_activation = self.activations[0]
-        
-# =============================================================================
-#         print("pred\n", pred)
-#         print("y\n", y)
-# =============================================================================
         
         #Backpropagation
         delta_output = 2 * (pred - y)
         
+        #Backpropagate through the 2nd hidden layer
+        hidden_activation2.derivative(hidden_layer2.output)
+        dhidden2 = np.dot(delta_output, output_layer.weights.T) * hidden_activation2.doutput
+        
+        #Backpropagate through the 1st hidden layer
         hidden_activation.derivative(hidden_layer.output)
         dhidden = np.dot(delta_output, output_layer.weights.T) * hidden_activation.doutput
         
         #Gradient Descent
-        output_layer.grad_weights = np.dot(hidden_activation.output.T, delta_output)
+        output_layer.grad_weights = np.dot(hidden_activation2.output.T, delta_output)
         output_layer.grad_biases = np.sum(delta_output, axis=0)
+        hidden_layer2.grad_weights = np.dot(hidden_activation.output.T, dhidden2)
+        hidden_layer2.grad_biases = np.sum(dhidden2, axis=0)
         hidden_layer.grad_weights = np.dot(X.T, dhidden)
         hidden_layer.grad_biases = np.sum(dhidden, axis=0)
         
         #Update Weights and Biases
         output_layer.weights -= learning_rate * output_layer.grad_weights
         output_layer.biases -= learning_rate * output_layer.grad_biases
+        hidden_layer2.weights -= learning_rate * hidden_layer2.grad_weights
+        hidden_layer2.biases -= learning_rate * hidden_layer2.grad_biases
         hidden_layer.weights -= learning_rate * hidden_layer.grad_weights
         hidden_layer.biases -= learning_rate * hidden_layer.grad_biases
         
-        # self.output_W = output_layer.weights
-        # self.output_B = output_layer.biases
-        # self.hidden_W = hidden_layer.weights
-        # self.hidden_B = hidden_layer.biases
+        oW = output_layer.weights
+        oB = output_layer.biases
+        h2W = hidden_layer2.weights
+        h2B = hidden_layer2.biases
+        hW = hidden_layer.weights
+        hB = hidden_layer.biases
 
 
-        return output_layer.weights, output_layer.biases, hidden_layer.weights, hidden_layer.biases
+        return oW, oB, h2W, h2B, hW, hB
             
-            
-        # output_layer = self.layers[1]
-        # hidden_layer = self.layers[0]
-        
-        # hidden_pred = self.activations[0]
-        
-        # #pred = predicted value
-        # derror_out = 2 * (pred - y)
-        # output_layer.grad_weights = pred * (1 - pred)
-        # output_layer.grad_weights = 
-        # print("1\n", output_layer.grad_weights)
-        # print("2\n", derror_out)
-        # print("3\n", output_layer.weights)
-        # output_layer.weights -= learning_rate * output_layer.grad_weights * derror_out
-            
-        # hidden_layer.grad_weights = hidden_pred.output * (1 - hidden_pred.output)
-        # hidden_layer.weights -= learning_rate * hidden_layer.grad_weights * derror_out
-        
-        # diff_output = y - self.prediction
-        
-        
-        
-        # for i in reversed(range(len(self.layers))):
-        #     # f_layer =  self.layers[i]
-        #     # f_activation = self.activations[i]
-        #     # # #Itt lehet hogy nem a relu kell
-        #     # prev_layer = self.activations[i-1]
-
-
-        
-            # if i == len(self.layers) - 1:
-                #self. <- kell ez?
-                # print("1:\n", f_activation.output)
-                
-            # self.diff_output = y - pred
-            
-            # print("y:\n", y)
-            # print("pred:\n", pred)
-            
-            
-            
-
-                
-                #--------------------------------------------------------
-                
-# =============================================================================
-#                 f_layer.grad_weights = 2 * (f_activation.output - 1)
-#                 f_layer.grad_weights = np.dot(prev_layer.output.T, f_layer.grad_weights)
-#                 print("2:\n", f_layer.grad_weights)
-#                 f_layer.grad_biases = np.sum(self.diff_output, axis=0, keepdims=True)
-#                 print("weights:\n", f_layer.weights)
-#                 f_layer.weights -= learning_rate * f_layer.grad_weights
-#                 print("3:\n", f_layer.weights)
-#                 f_layer.biases -= learning_rate * f_layer.grad_biases
-#                 
-#             elif i == 0:
-#                 prev_layer = X
-# =============================================================================
-                
-                
-                
-
-
-# =============================================================================
-#                 f_layer.grad_weights = 2 * (f_layer.output - 1)
-#                 f_layer.grad_weights = np.dot(prev_layer.T, f_layer.grad_weights)
-#                 f_layer.grad_biases = np.dot(self.diff_output.T, f_activation.output)
-#                 f_layer.grad_biases = np.sum(f_layer.grad_biases, axis=0, keepdims=True)
-#                 f_layer.weights -= learning_rate * f_layer.grad_weights
-#                 f_layer.biases -= learning_rate * f_layer.grad_biases
-# =============================================================================
-
-                
-                
-            # else:
             
     # def train(self, training, learning_rate, epochs, batch_size):
     def train(self, X, y, learning_rate, epochs, batch_size, train_ratio):
@@ -370,35 +290,8 @@ class NeuralNetwork:
         self.learning_rate = learning_rate
         # print("LR", learning_rate)
         
-        # total_rows = X.shape[0]
-        # train_size = int(total_rows * train_ratio)
-        # testing_size = int(total_rows-train_size)
-        
-        # batch_x = X
-        # batch_y = y
-        
-        #random batch group
-        # batch_x = X[:train_size, :]
-        # batch_y = y[:train_size, :]
-        
         batch_x = X[:batch_size, :]
         batch_y = y[:batch_size, :]
-        
-        # test_x = X[train_size:, :]
-        # test_y = y[train_size:, :]
-        
-        
-        # print("batch_x\n", len(batch_x))
-        # print("batch_y\n", len(batch_y))
-        
-        # print("test_x\n", len(test_x))
-        # print("test_y\n", len(test_y))
-        
-        # print("batch_x\n", batch_x)
-        # print("test_x\n", test_x)
-        
-        # print("train.shape", batch_x.shape)
-        # print("test.shape", test_x.shape)
         
         for epoch in range(epochs):
             loss = 0.0
@@ -418,7 +311,7 @@ class NeuralNetwork:
             # print("INBACKWARD")
 
             #backward propagation
-            ow, ob, hw, hb = self.backward(batch_x, batch_y, learning_rate)
+            ow, ob, h2w, h2b, hw, hb = self.backward(batch_x, batch_y, learning_rate)
             
             # print("epochs", epochs)
             # print("epoch:", epoch)
@@ -427,6 +320,8 @@ class NeuralNetwork:
                 model_Ws_Bs = {
                     'hidden_W': hw.tolist(),
                     'hidden_B': hb.tolist(),
+                    'hidden2_W': h2w.tolist(),
+                    'hidden2_B': h2b.tolist(),
                     'output_W': ow.tolist(),
                     'output_B': ob.tolist()
                 }
@@ -551,13 +446,13 @@ print("train_y\n", len(train_y))
 # print("tx", shuffle_data(training).train_x)
 # print("ty", shuffle_data(training).train_y)
 
-learning_rate = 0.01 #0.1
+learning_rate = 0.01
 epochs = 100
-train_ratio = 0.6
-batch_size = 20
-test_size = round(batch_size/2)
+train_ratio = 0.8
+batch_size = 28
+test_size = round(batch_size*(1-train_ratio))
 print("TEST_SIZE", test_size)
-nn = NeuralNetwork(35, 50, 6)
+nn = NeuralNetwork(39, 64, 8)
 
 model = nn.train(np.array(train_x), np.array(train_y), learning_rate, epochs, batch_size, train_ratio)
     

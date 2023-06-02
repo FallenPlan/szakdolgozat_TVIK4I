@@ -3,7 +3,7 @@ import ChatBot2 as chatBot
 from ChatBot2 import pred_label, get_response
 import json
 
-with open(r"C:\szakdolgozat_TVIK4I\ChatBot\chatbotEnvironment\intents.json") as file:
+with open(r"C:\\szakdolgozat_TVIK4I\\ChatBot\\chatbotEnvironment\\intentsNEW.json") as file:
     intents = json.load(file)
 
 app = Flask(__name__, static_folder='static')
